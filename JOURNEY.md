@@ -1,22 +1,23 @@
 # User Journeys & Edge Cases: WhatsApp Scheduler
 
 ## Core Journey: The Happy Path
-
-1. **User** sends a POST request to `/api/schedule` with a valid WhatsApp number, a message body, and a `scheduledTime` (e.g., 10 minutes in the future).
+1. **User** sends a POST request to `/api/schedule` with a valid WhatsApp number, body, and `scheduledTime`.
 2. **System** saves the message to PostgreSQL with status `PENDING`.
 3. **System** enqueues a job in BullMQ to execute at the exact `scheduledTime`.
-4. **System** responds with `201 Created` and the `messageId`.
-5. _(Time passes)_
-6. **Worker** picks up the job, calls the Twilio API, and successfully sends the message.
-7. **System** updates the PostgreSQL record status to `SENT`.
+4. **System** responds with `201 Created`.
+5. *(Time passes)*
+6. **Worker** picks up the job and sends an HTTP POST request to the local Evolution API container (`/message/sendText`).
+7. **Evolution API** successfully routes the message to WhatsApp.
+8. **System** updates the PostgreSQL record status to `SENT`.
 
 ## Edge Cases (Must be tested)
-
-1. **Validation Failure:** User sends an invalid phone number format or a `scheduledTime` in the past.
-   - _Expected:_ System rejects with `400 Bad Request` and Zod validation errors. DB is not touched.
-2. **Twilio API Failure:** Worker attempts to send, but Twilio API is down or returns a 500 error.
-   - _Expected:_ Worker catches the error, leaves the DB status as `PENDING`, increments `retryCount`, and relies on BullMQ's exponential backoff to try again.
-3. **Max Retries Exceeded:** Worker fails to send after 3 attempts.
-   - _Expected:_ Worker marks the PostgreSQL record status as `FAILED`. Job is moved to the BullMQ Dead Letter Queue.
-4. **Idempotency Check:** A network blip causes the worker to process the exact same job twice.
-   - _Expected:_ Worker checks the DB. If status is already `SENT`, it safely exits without calling Twilio again.
+1. **Validation Failure:** Invalid phone number format or past date. 
+   - *Expected:* Reject with `400 Bad Request`. DB is not touched.
+2. **Evolution API Gateway Down:** Worker attempts to send, but the Evolution API Docker container is offline or returns a 500.
+   - *Expected:* Worker catches error, DB remains `PENDING`, increments `retryCount`, relies on BullMQ's exponential backoff.
+3. **WhatsApp Disconnected:** Evolution API is running, but the user's phone is disconnected from the instance (Returns 401/403).
+   - *Expected:* Worker catches the specific authentication error and triggers a critical log.
+4. **Max Retries Exceeded:** Worker fails to send after 3 attempts.
+   - *Expected:* Mark DB status as `FAILED`. Move job to Dead Letter Queue.
+5. **Idempotency Check:** Network blip causes worker to process the exact same job twice.
+   - *Expected:* Worker checks DB. If status is already `SENT`, exit safely without calling Evolution API.
