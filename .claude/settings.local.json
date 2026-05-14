@@ -5,7 +5,15 @@
       "Bash(npm install *)",
       "Bash(npx prisma *)",
       "Bash(npm run *)",
-      "Bash(npm uninstall *)"
+      "Bash(npm uninstall *)",
+      "Bash(docker compose up *)",
+      "Bash(docker compose logs *)",
+      "Bash(curl -s -H \"apikey: evolution_api_key\" http://localhost:8080/instance/connect/scheduler)",
+      "Bash(curl *)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\([r for r in d.get\\('routes',[]\\) if 'qr' in r.get\\('path',''\\).lower\\(\\)][:10]\\)\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); routes=[r['path'] for r in d.get\\('routes',[]\\)] if isinstance\\(d,dict\\) else []; print\\('\\\\n'.join\\(r for r in routes if 'qr' in r.lower\\(\\) or 'instance' in r.lower\\(\\)\\)\\)\")",
+      "Bash(docker compose *)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); [print\\(i.get\\('name'\\), i.get\\('connectionStatus'\\)\\) for i in d]\")"
     ]
   }
 }

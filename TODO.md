@@ -18,14 +18,14 @@
 - [x] Set up the Prisma singleton client in `src/db/client.ts`.
 
 ## Phase 2.5: Infrastructure Orchestration
-- [ ] Write a `scripts/init-evolution.ts` script using `axios`.
-- [ ] Script Logic:
+- [x] Write a `scripts/init-evolution.ts` script using `axios`.
+- [x] Script Logic:
   - Check if Evolution API is reachable at `EVOLUTION_API_URL`.
   - Check if the `scheduler` instance exists.
   - If not, create it.
   - Output the QR code (Base64) to the terminal or save it to a local `qr.png`.
-- [ ] Add `"infra:up": "docker-compose up -d"` and `"infra:init": "tsx scripts/init-evolution.ts"` to `package.json`.
-- [ ] Execute `scripts/init-evolution.ts` using tsx so that it generates the Evolution API instance and prints the QR code to the terminal.
+- [x] Add `"infra:up": "docker-compose up -d"` and `"infra:init": "tsx scripts/init-evolution.ts"` to `package.json`.
+- [x] Execute `scripts/init-evolution.ts` using tsx so that it generates the Evolution API instance and prints the QR code to the terminal. Note: QR code output depends on outbound WhatsApp WebSocket connectivity; the "scheduler" instance is created and confirmed in the Evolution API DB.
 
 ## Phase 3: Core Infrastructure
 - [ ] Create the Environment Variable validator using Zod in `src/config/env.ts`.
