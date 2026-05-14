@@ -5,11 +5,11 @@
 
 ## Phase 1: Environment & Schema Bootstrapping
 - [x] Initialize `package.json` (`npm init -y`).
-- [ ] Install dependencies: TypeScript, Prisma, BullMQ, Redis, Pino, Zod, Express, `axios` (or `node-fetch`).
-- [ ] Install dev dependencies: `@types/node`, `@types/express`, `tsx`, `typescript`, Vitest, Supertest.
-- [ ] Initialize `tsconfig.json` with strict mode enabled.
-- [ ] Create a `docker-compose.yml` for PostgreSQL, Redis, **AND Evolution API**. Ensure Evolution API exposes port 8080.
-- [ ] Create a `.env.example` file (Include EVOLUTION_API_URL and EVOLUTION_API_KEY).
+- [x] Install dependencies: TypeScript, Prisma, BullMQ, Redis, Pino, Zod, Express, `axios` (or `node-fetch`).
+- [x] Install dev dependencies: `@types/node`, `@types/express`, `tsx`, `typescript`, Vitest, Supertest.
+- [x] Initialize `tsconfig.json` with strict mode enabled.
+- [x] Create a `docker-compose.yml` for PostgreSQL, Redis, **AND Evolution API**. Ensure Evolution API exposes port 8080.
+- [x] Create a `.env.example` file (Include EVOLUTION_API_URL and EVOLUTION_API_KEY).
 
 ## Phase 2: Database & Schema
 - [x] Initialize Prisma (`npx prisma init`).
