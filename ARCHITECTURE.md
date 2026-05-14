@@ -42,6 +42,7 @@ Must follow a modular, domain-driven structure:
 
 ## 5. Constraints & Rules
 
+- **Automation:** The project must include a setup.ts utility script. This script checks if the Evolution API is healthy, creates the required instance if it doesn't exist, and retrieves the QR code for the user to scan.
 - **Idempotency:** A message must never be sent twice.
 - **Separation of Concerns:** Route handlers must not contain business logic; they should call domain functions.
 - **Microservice Boundary:** The Node.js application must NEVER attempt to manage WhatsApp WebSockets directly. All communication must happen via REST to the Evolution API.
