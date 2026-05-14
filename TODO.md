@@ -5,19 +5,19 @@
 
 ## Phase 1: Environment & Schema Bootstrapping
 
-- [ ] Initialize `package.json` (`npm init -y`).
-- [ ] Install dependencies: TypeScript, Prisma, BullMQ, Redis, Twilio, Pino, Zod, Express, plus Vitest and Supertest for testing.
-- [ ] Install dev dependencies: `@types/node`, `@types/express`, `tsx`, `typescript`.
-- [ ] Initialize `tsconfig.json` with strict mode enabled.
-- [ ] Create a `docker-compose.yml` for PostgreSQL and Redis.
-- [ ] Create a `.env.example` file.
+- [x] Initialize `package.json` (`npm init -y`).
+- [x] Install dependencies: TypeScript, Prisma, BullMQ, Redis, Twilio, Pino, Zod, Express, plus Vitest and Supertest for testing.
+- [x] Install dev dependencies: `@types/node`, `@types/express`, `tsx`, `typescript`.
+- [x] Initialize `tsconfig.json` with strict mode enabled.
+- [x] Create a `docker-compose.yml` for PostgreSQL and Redis.
+- [x] Create a `.env.example` file.
 
 ## Phase 2: Database & Schema
 
-- [ ] Initialize Prisma (`npx prisma init`).
-- [ ] Define the `ScheduledMessage` model in `schema.prisma` (id, recipient, body, sendAt, status, retryCount).
-- [ ] Run `npx prisma generate`.
-- [ ] Set up the Prisma singleton client in `src/db/client.ts`.
+- [x] Initialize Prisma (`npx prisma init`).
+- [x] Define the `ScheduledMessage` model in `schema.prisma` (id, recipient, body, sendAt, status, retryCount).
+- [x] Run `npx prisma generate`.
+- [x] Set up the Prisma singleton client in `src/db/client.ts`.
 
 ## Phase 3: Core Infrastructure
 
