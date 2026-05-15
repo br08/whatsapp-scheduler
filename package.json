@@ -9,7 +9,7 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit",
-    "infra:up": "docker-compose up -d",
+    "infra:up": "docker compose up -d",
     "infra:init": "tsx scripts/init-evolution.ts"
   },
   "keywords": [],
