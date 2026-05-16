@@ -11,6 +11,7 @@
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit",
+    "start": "tsx scripts/startup.ts",
     "infra:up": "docker compose up -d",
     "infra:init": "tsx scripts/init-evolution.ts"
   },

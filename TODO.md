@@ -67,5 +67,5 @@
 - [x] Verified end-to-end flow: scheduled two real WhatsApp messages via `POST /api/schedule` and confirmed delivery through the Evolution API (BullMQ worker processed jobs at exact scheduled times).
 
 ## Phase 9: Unified Startup Flow
-- [ ] Create a unified startup flow that makes all necessary services be up and running.
-- [ ] Ensure the flow sequentially or concurrently handles `npm run infra:up`, `npm run infra:init`, and `npx prisma dev` so the developer can start the whole system smoothly.
+- [x] Create a unified startup flow that makes all necessary services be up and running. (Created scripts/startup.ts; added `npm start` script.)
+- [x] Ensure the flow handles startup in the correct order: `docker compose up -d` first, wait for PostgreSQL (port 5432) and Evolution API to be reachable, then `prisma migrate deploy` and `infra:init` in parallel, then poll until the Evolution API instance reaches `open` state (QR scanned), and only then start the dev server. (Fixed DATABASE_URL to use docker-compose postgres at localhost:5432/whatsapp_scheduler; baselined existing schema with `prisma migrate resolve --applied 20260516190214_init`.)
