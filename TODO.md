@@ -28,9 +28,9 @@
 - [x] Execute `scripts/init-evolution.ts` using tsx so that it generates the Evolution API instance and prints the QR code to the terminal. Note: QR code output depends on outbound WhatsApp WebSocket connectivity; the "scheduler" instance is created and confirmed in the Evolution API DB.
 
 ## Phase 3: Core Infrastructure
-- [ ] Create the Environment Variable validator using Zod in `src/config/env.ts`.
-- [ ] Set up the Pino logger in `src/utils/logger.ts`.
-- [ ] Create the WhatsApp REST wrapper in `src/services/whatsapp.ts`. This should use Axios/Fetch to send payloads to the Evolution API container.
+- [x] Create the Environment Variable validator using Zod in `src/config/env.ts`.
+- [x] Set up the Pino logger in `src/utils/logger.ts`.
+- [x] Create the WhatsApp REST wrapper in `src/services/whatsapp.ts`. This should use Axios/Fetch to send payloads to the Evolution API container.
 
 ## Phase 4: Test Environment Setup
 - [ ] Configure Vitest in `vitest.config.ts`.
