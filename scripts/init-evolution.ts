@@ -30,26 +30,39 @@ interface CreateInstanceResponse {
   qrcode?: { base64: string };
 }
 
-async function checkReachable(): Promise<void> {
+async function checkReachable(maxWaitMs = 30_000): Promise<void> {
+  const deadline = Date.now() + maxWaitMs;
+  while (Date.now() < deadline) {
+    try {
+      await client.get('/');
+      return;
+    } catch (err) {
+      const e = err as AxiosError;
+      if (e.response) {
+        // We reached the server, but it returned an error status (e.g., 401, 404)
+        return;
+      }
+      // Not reachable yet, wait and retry
+      await new Promise((r) => setTimeout(r, 2_000));
+    }
+  }
+  throw new Error(`Evolution API not reachable at ${EVOLUTION_API_URL}: timeout exceeded`);
+}
+
+/** Returns the connection state (e.g. 'open', 'connecting', 'close') or null if the instance doesn't exist. */
+async function getInstanceState(): Promise<string | null> {
   try {
-    await client.get('/');
+    const res = await client.get<InstanceState>(`/instance/connectionState/${INSTANCE_NAME}`);
+    return res.data.instance.state;
   } catch (err) {
     const e = err as AxiosError;
-    if (!e.response) {
-      throw new Error(`Evolution API not reachable at ${EVOLUTION_API_URL}: ${e.message}`);
-    }
+    if (e.response?.status === 404) return null;
+    throw err;
   }
 }
 
-async function instanceExists(): Promise<boolean> {
-  try {
-    await client.get<InstanceState>(`/instance/connectionState/${INSTANCE_NAME}`);
-    return true;
-  } catch (err) {
-    const e = err as AxiosError;
-    if (e.response?.status === 404) return false;
-    throw err;
-  }
+async function deleteInstance(): Promise<void> {
+  await client.delete(`/instance/delete/${INSTANCE_NAME}`);
 }
 
 async function createInstance(): Promise<string | null> {
@@ -101,24 +114,35 @@ async function main(): Promise<void> {
   await checkReachable();
   console.log('Evolution API is reachable.');
 
-  const exists = await instanceExists();
-  let qrBase64: string | null = null;
+  let state = await getInstanceState();
 
-  if (exists) {
-    console.log(`Instance "${INSTANCE_NAME}" already exists. Polling for QR code...`);
-  } else {
-    console.log(`Creating instance "${INSTANCE_NAME}"...`);
-    await createInstance();
-    console.log(`Instance "${INSTANCE_NAME}" created. Polling for QR code...`);
+  if (state === 'open') {
+    console.log(`Instance "${INSTANCE_NAME}" is already authenticated. Nothing to do.`);
+    return;
   }
 
-  qrBase64 = await pollQrCode();
+  if (state !== null) {
+    // Instance exists but is not authenticated (e.g. stuck in 'connecting' or 'close').
+    // Delete it so we can create a fresh one and get a new QR code.
+    console.log(`Instance "${INSTANCE_NAME}" found in state "${state}" — deleting stale instance...`);
+    await deleteInstance();
+    // Brief pause: Evolution API returns 403 if you recreate the same name immediately after deletion.
+    await new Promise((r) => setTimeout(r, 3_000));
+    console.log('Stale instance deleted.');
+  }
+
+  console.log(`Creating instance "${INSTANCE_NAME}"...`);
+  await createInstance();
+  console.log(`Instance created. Polling for QR code...`);
+
+  const qrBase64 = await pollQrCode();
 
   if (qrBase64) {
     saveQrPng(qrBase64);
     printQrToTerminal(qrBase64);
   } else {
-    console.log('No QR code returned — instance may already be authenticated.');
+    console.log('No QR code returned — timed out waiting for the API to generate one. Try running again.');
+    process.exit(1);
   }
 }
 

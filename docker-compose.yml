@@ -27,6 +27,7 @@ services:
       DATABASE_PROVIDER: postgresql
       DATABASE_CONNECTION_URI: postgresql://postgres:postgres@postgres:5432/evolution
       DATABASE_CONNECTION_CLIENT_NAME: evolution_api
+      CONFIG_SESSION_PHONE_VERSION: ''
       CACHE_REDIS_ENABLED: 'true'
       CACHE_REDIS_URI: redis://redis:6379
       CACHE_REDIS_PREFIX_KEY: evolution
