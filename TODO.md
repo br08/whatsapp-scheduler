@@ -58,3 +58,4 @@
 - [x] Add graceful shutdown logic (close DB, close Queue). (Created src/index.ts with shutdown() that closes HTTP server, worker, queue, Redis, and Prisma in order.)
 - [x] Ensure graceful shutdown hooks are in place for the Express server and BullMQ connections. (SIGTERM and SIGINT handlers wired in src/index.ts.)
 - [x] Fix any linting errors. (tsc --noEmit clean; 12/12 tests passing.)
+- [x] Raise coverage threshold to 95%. (Added tests/infra.test.ts covering env error path, Prisma production guard, and pino-pretty development transport; all four metrics reached 100%. Thresholds updated from 80 → 95 in vitest.config.ts.)
