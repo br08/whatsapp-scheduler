@@ -38,10 +38,10 @@
 - [x] Create mock interceptors (using MSW or native Jest/Vitest mocks) for the Evolution API HTTP calls so we don't send real network requests during tests.
 
 ## Phase 5: Writing the Tests (Failing State)
-- [ ] Read `JOURNEY.md`.
-- [ ] Write API endpoint tests in `tests/api.test.ts` (Happy path + Validation edge cases).
-- [ ] Write worker tests in `tests/worker.test.ts` (Happy path + Gateway Down + Max retries + Idempotency).
-- [ ] Run `npm run test` and verify that tests fail.
+- [x] Read `JOURNEY.md`.
+- [x] Write API endpoint tests in `tests/api.test.ts` (Happy path + Validation edge cases).
+- [x] Write worker tests in `tests/worker.test.ts` (Happy path + Gateway Down + Max retries + Idempotency).
+- [x] Run `npm run test` and verify that tests fail. (Failing: missing @/src/api/app and @/src/queues/worker — correct Phase 5 state. Fixed Prisma v7 adapter setup and vitest globals in tsconfig.)
 
 ## Phase 6: Implementation (Green State)
 - [ ] Create a POST endpoint in `src/api/routes.ts` to accept scheduling requests.
