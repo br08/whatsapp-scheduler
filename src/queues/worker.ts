@@ -9,6 +9,8 @@ export const MAX_RETRIES = 3;
 export async function processJob(job: Job): Promise<void> {
   const { messageId } = job.data as { messageId: string };
 
+  logger.info({ messageId, jobId: job.id, attempt: job.attemptsMade }, 'Processing message job');
+
   const message = await prisma.scheduledMessage.findUniqueOrThrow({ where: { id: messageId } });
 
   if (message.status === MessageStatus.SENT) {
@@ -22,6 +24,7 @@ export async function processJob(job: Job): Promise<void> {
       where: { id: messageId },
       data: { status: MessageStatus.SENT },
     });
+    logger.info({ messageId, recipient: message.recipient }, 'Message sent successfully');
   } catch (err) {
     const isLastAttempt = job.attemptsMade >= MAX_RETRIES - 1;
     await prisma.scheduledMessage.update({

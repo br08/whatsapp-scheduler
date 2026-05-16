@@ -54,7 +54,7 @@
 - [x] Ensure coverage is at least 80%. Add more tests if needed. (Branches: 82.6%, Statements: 95.45%, Functions: 88.88%, Lines: 95.45% — all ≥ 80%.)
 
 ## Phase 7: Refactoring & Polish
-- [ ] Add structured logging (Pino) to the worker logic.
-- [ ] Add graceful shutdown logic (close DB, close Queue).
-- [ ] Ensure graceful shutdown hooks are in place for the Express server and BullMQ connections.
-- [ ] Fix any linting errors.
+- [x] Add structured logging (Pino) to the worker logic. (Added info logs for job start and success paths in processJob; error path already had logging.)
+- [x] Add graceful shutdown logic (close DB, close Queue). (Created src/index.ts with shutdown() that closes HTTP server, worker, queue, Redis, and Prisma in order.)
+- [x] Ensure graceful shutdown hooks are in place for the Express server and BullMQ connections. (SIGTERM and SIGINT handlers wired in src/index.ts.)
+- [x] Fix any linting errors. (tsc --noEmit clean; 12/12 tests passing.)
