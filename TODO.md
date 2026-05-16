@@ -33,9 +33,9 @@
 - [x] Create the WhatsApp REST wrapper in `src/services/whatsapp.ts`. This should use Axios/Fetch to send payloads to the Evolution API container.
 
 ## Phase 4: Test Environment Setup
-- [ ] Configure Vitest in `vitest.config.ts`.
-- [ ] Create a test setup file to wipe the database and flush Redis before each test.
-- [ ] Create mock interceptors (using MSW or native Jest/Vitest mocks) for the Evolution API HTTP calls so we don't send real network requests during tests.
+- [x] Configure Vitest in `vitest.config.ts`.
+- [x] Create a test setup file to wipe the database and flush Redis before each test.
+- [x] Create mock interceptors (using MSW or native Jest/Vitest mocks) for the Evolution API HTTP calls so we don't send real network requests during tests.
 
 ## Phase 5: Writing the Tests (Failing State)
 - [ ] Read `JOURNEY.md`.
