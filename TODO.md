@@ -59,3 +59,9 @@
 - [x] Ensure graceful shutdown hooks are in place for the Express server and BullMQ connections. (SIGTERM and SIGINT handlers wired in src/index.ts.)
 - [x] Fix any linting errors. (tsc --noEmit clean; 12/12 tests passing.)
 - [x] Raise coverage threshold to 95%. (Added tests/infra.test.ts covering env error path, Prisma production guard, and pino-pretty development transport; all four metrics reached 100%. Thresholds updated from 80 → 95 in vitest.config.ts.)
+
+## Phase 8: Runtime Fixes & First Live Send
+- [x] Fix dotenv load order: added `import 'dotenv/config'` as the first import in `src/index.ts`. Root cause: `db/client.ts` was evaluated (via `api/app → api/routes`) before `config/env.ts` had a chance to load dotenv, so `DATABASE_URL` was `undefined` when `PrismaPg` was instantiated, causing SCRAM auth failure on every query.
+- [x] Fix DATABASE_URL: the `.env` used a `prisma+postgres://` URL intended for Prisma's own adapter, but `db/client.ts` uses `PrismaPg` (the raw pg adapter), which can't parse that protocol. Updated `.env` to the plain `postgres://postgres:postgres@localhost:51214/...` URL extracted from the encoded API key.
+- [x] Run initial Prisma migration: `prisma migrate dev --name init` to create the `ScheduledMessage` table, which had never been applied to the local database.
+- [x] Verified end-to-end flow: scheduled two real WhatsApp messages via `POST /api/schedule` and confirmed delivery through the Evolution API (BullMQ worker processed jobs at exact scheduled times).
