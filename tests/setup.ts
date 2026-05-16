@@ -8,7 +8,7 @@ const redis = createClient({ url: env.REDIS_URL });
 
 beforeAll(async () => {
   await redis.connect();
-  server.listen({ onUnhandledRequest: 'error' });
+  server.listen({ onUnhandledRequest: 'warn' });
 });
 
 afterAll(async () => {

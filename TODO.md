@@ -44,14 +44,17 @@
 - [x] Run `npm run test` and verify that tests fail. (Failing: missing @/src/api/app and @/src/queues/worker — correct Phase 5 state. Fixed Prisma v7 adapter setup and vitest globals in tsconfig.)
 
 ## Phase 6: Implementation (Green State)
-- [ ] Create a POST endpoint in `src/api/routes.ts` to accept scheduling requests.
-- [ ] Implement Zod validators to validate the incoming payloads (recipient, body, scheduledTime).
-- [ ] Setup BullMQ connection in `src/queues/connection.ts` and producer in `src/queues/producer.ts`.
-- [ ] Wire the POST endpoint to the database creation (save as PENDING) and the queue producer.
-- [ ] Implement the BullMQ worker logic in `src/queues/worker.ts` to process jobs, call the REST wrapper, and update database status to make worker tests pass.
-- [ ] Run `npm run test` to ensure full test suite is green.
+- [x] Create a POST endpoint in `src/api/routes.ts` to accept scheduling requests.
+- [x] Implement Zod validators to validate the incoming payloads (recipient, body, scheduledTime).
+- [x] Setup BullMQ connection in `src/queues/connection.ts` and producer in `src/queues/producer.ts`.
+- [x] Wire the POST endpoint to the database creation (save as PENDING) and the queue producer.
+- [x] Implement the BullMQ worker logic in `src/queues/worker.ts` to process jobs, call the REST wrapper, and update database status to make worker tests pass.
+- [x] Run `npm run test` to ensure full test suite is green. (10/10 passing. Fixed MSW v2 onUnhandledRequest: 'error' blocking passthrough for supertest requests — changed to 'warn'. Used regex-free Zod validation for scheduledTime to avoid Zod v4 API drift.)
+- [x] Add test coverage to ensure all code is tested. (Added @vitest/coverage-v8; fileParallelism: false to fix shared-DB race condition under coverage; new tests/whatsapp.test.ts for network-error and malformed-response paths.)
+- [x] Ensure coverage is at least 80%. Add more tests if needed. (Branches: 82.6%, Statements: 95.45%, Functions: 88.88%, Lines: 95.45% — all ≥ 80%.)
 
 ## Phase 7: Refactoring & Polish
 - [ ] Add structured logging (Pino) to the worker logic.
 - [ ] Add graceful shutdown logic (close DB, close Queue).
 - [ ] Ensure graceful shutdown hooks are in place for the Express server and BullMQ connections.
+- [ ] Fix any linting errors.
