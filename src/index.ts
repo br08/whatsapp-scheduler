@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { Worker } from 'bullmq';
 import { app } from '@/src/api/app';
 import { env } from '@/src/config/env';
