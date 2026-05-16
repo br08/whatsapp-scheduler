@@ -69,3 +69,8 @@
 ## Phase 9: Unified Startup Flow
 - [x] Create a unified startup flow that makes all necessary services be up and running. (Created scripts/startup.ts; added `npm start` script.)
 - [x] Ensure the flow handles startup in the correct order: `docker compose up -d` first, wait for PostgreSQL (port 5432) and Evolution API to be reachable, then `prisma migrate deploy` and `infra:init` in parallel, then poll until the Evolution API instance reaches `open` state (QR scanned), and only then start the dev server. (Fixed DATABASE_URL to use docker-compose postgres at localhost:5432/whatsapp_scheduler; baselined existing schema with `prisma migrate resolve --applied 20260516190214_init`.)
+
+## Phase 10: Deploy
+- [ ] Create a robust deployment mechanism (e.g., a script or Docker compose configuration) that installs and starts everything up on any machine.
+- [ ] Ensure the deployment process makes the application fully ready for scheduling and sending messages.
+- [ ] Implement a wait/healthcheck logic so that Prisma (and the main application) waits for the Evolution API to be fully running and properly authenticated (QR Code scanned) before starting.
