@@ -65,3 +65,7 @@
 - [x] Fix DATABASE_URL: the `.env` used a `prisma+postgres://` URL intended for Prisma's own adapter, but `db/client.ts` uses `PrismaPg` (the raw pg adapter), which can't parse that protocol. Updated `.env` to the plain `postgres://postgres:postgres@localhost:51214/...` URL extracted from the encoded API key.
 - [x] Run initial Prisma migration: `prisma migrate dev --name init` to create the `ScheduledMessage` table, which had never been applied to the local database.
 - [x] Verified end-to-end flow: scheduled two real WhatsApp messages via `POST /api/schedule` and confirmed delivery through the Evolution API (BullMQ worker processed jobs at exact scheduled times).
+
+## Phase 9: Unified Startup Flow
+- [ ] Create a unified startup flow that makes all necessary services be up and running.
+- [ ] Ensure the flow sequentially or concurrently handles `npm run infra:up`, `npm run infra:init`, and `npx prisma dev` so the developer can start the whole system smoothly.

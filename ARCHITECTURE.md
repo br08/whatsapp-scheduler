@@ -46,3 +46,10 @@ Must follow a modular, domain-driven structure:
 - **Idempotency:** A message must never be sent twice.
 - **Separation of Concerns:** Route handlers must not contain business logic; they should call domain functions.
 - **Microservice Boundary:** The Node.js application must NEVER attempt to manage WhatsApp WebSockets directly. All communication must happen via REST to the Evolution API.
+
+## 6. Startup Flow
+
+Prisma must run as a separate service. To start the whole system, the following sequence of commands must be executed:
+1. `npm run infra:up`: Starts the underlying infrastructure (e.g., Postgres, Redis, Evolution API) using Docker.
+2. `npm run infra:init`: Initializes the Evolution API and needed configurations.
+3. `npx prisma dev`: Starts the Prisma development service.
