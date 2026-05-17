@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { prisma } from '@/src/db/client';
 import { enqueueMessage } from '@/src/queues/producer';
+import { sendTextMessage } from '@/src/services/whatsapp';
 import { MessageStatus } from '@prisma/client';
 
 const scheduleSchema = z.object({
@@ -32,4 +33,41 @@ router.post('/schedule', async (req, res) => {
   await enqueueMessage(message.id, sendAt);
 
   res.status(201).json({ id: message.id, status: message.status });
+});
+
+const sendSchema = z.object({
+  recipient: z.string().min(1),
+  body: z.string().min(1),
+});
+
+router.post('/send', async (req, res) => {
+  const result = sendSchema.safeParse(req.body);
+  if (!result.success) {
+    res.status(400).json({ error: 'Validation failed' });
+    return;
+  }
+
+  const { recipient, body } = result.data;
+  const messageId = await sendTextMessage(recipient, body);
+  res.status(200).json({ messageId });
+});
+
+router.get('/schedule', async (_req, res) => {
+  const messages = await prisma.scheduledMessage.findMany({
+    orderBy: { sendAt: 'asc' },
+    select: { id: true, recipient: true, body: true, sendAt: true, status: true, retryCount: true },
+  });
+  res.json(messages);
+});
+
+router.get('/schedule/:id', async (req, res) => {
+  const message = await prisma.scheduledMessage.findUnique({
+    where: { id: req.params.id },
+    select: { id: true, recipient: true, body: true, sendAt: true, status: true, retryCount: true },
+  });
+  if (!message) {
+    res.status(404).json({ error: 'Message not found' });
+    return;
+  }
+  res.json(message);
 });
