@@ -71,6 +71,6 @@
 - [x] Ensure the flow handles startup in the correct order: `docker compose up -d` first, wait for PostgreSQL (port 5432) and Evolution API to be reachable, then `prisma migrate deploy` and `infra:init` in parallel, then poll until the Evolution API instance reaches `open` state (QR scanned), and only then start the dev server. (Fixed DATABASE_URL to use docker-compose postgres at localhost:5432/whatsapp_scheduler; baselined existing schema with `prisma migrate resolve --applied 20260516190214_init`.)
 
 ## Phase 10: Deploy
-- [ ] Create a robust deployment mechanism (e.g., a script or Docker compose configuration) that installs and starts everything up on any machine.
-- [ ] Ensure the deployment process makes the application fully ready for scheduling and sending messages.
-- [ ] Implement a wait/healthcheck logic so that Prisma (and the main application) waits for the Evolution API to be fully running and properly authenticated (QR Code scanned) before starting.
+- [x] Create a robust deployment mechanism (e.g., a script or Docker compose configuration) that installs and starts everything up on any machine. (Added deploy.sh entry-point script; added docker-compose healthchecks for postgres and redis so evolution-api waits for healthy deps.)
+- [x] Ensure the deployment process makes the application fully ready for scheduling and sending messages. (deploy.sh validates prerequisites, installs deps, checks .env, then delegates to npm start / scripts/startup.ts.)
+- [x] Implement a wait/healthcheck logic so that Prisma (and the main application) waits for the Evolution API to be fully running and properly authenticated (QR Code scanned) before starting. (scripts/startup.ts polls postgres and evolution-api health, runs migrations, then blocks until instance state === 'open' before starting dev server.)

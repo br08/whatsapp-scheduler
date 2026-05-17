@@ -9,11 +9,21 @@ services:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   redis:
     image: redis:7-alpine
     ports:
       - '6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   evolution-api:
     image: atendai/evolution-api:latest
@@ -34,8 +44,10 @@ services:
       CACHE_REDIS_SAVE_INSTANCES: 'false'
       CACHE_LOCAL_ENABLED: 'false'
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     restart: on-failure
 
 volumes:
