@@ -1,5 +1,11 @@
 # Claude Code Instructions
 
+# Project Documentation
+- Architecture details are in `docs/ARCHITECTURE.md`
+- Current tasks are in `docs/TODO.md`
+- User journey is in `docs/JOURNEY.md`
+- Always check these files before starting new tasks.
+
 ## Build & Test Commands
 
 - Start dev server: `npm run dev`
