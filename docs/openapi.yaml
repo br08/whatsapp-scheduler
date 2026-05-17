@@ -1,0 +1,162 @@
+openapi: 3.0.3
+info:
+  title: WhatsApp Scheduler API
+  version: 1.0.0
+  description: Schedule and send WhatsApp messages via the Evolution API gateway.
+
+servers:
+  - url: /api
+
+components:
+  schemas:
+    ScheduledMessage:
+      type: object
+      required: [id, recipient, body, sendAt, status, retryCount]
+      properties:
+        id:
+          type: string
+          example: cmpa2gg140000tmo5tivi24m8
+        recipient:
+          type: string
+          example: "5585981480630"
+        body:
+          type: string
+          example: "Hello!"
+        sendAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [PENDING, SENT, FAILED]
+        retryCount:
+          type: integer
+
+    ValidationError:
+      type: object
+      properties:
+        error:
+          type: string
+
+    NotFoundError:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Message not found"
+
+paths:
+  /schedule:
+    post:
+      summary: Schedule message
+      operationId: createScheduledMessage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [recipient, body, scheduledTime]
+              properties:
+                recipient:
+                  type: string
+                  example: "5585981480630"
+                body:
+                  type: string
+                  example: "Teste"
+                scheduledTime:
+                  type: string
+                  format: date-time
+                  description: ISO 8601 date-time in the future
+                  example: "2026-05-17T17:46:42.618Z"
+      responses:
+        "201":
+          description: Message scheduled
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  status:
+                    type: string
+                    enum: [PENDING]
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+
+    get:
+      summary: List scheduled messages
+      operationId: listScheduledMessages
+      responses:
+        "200":
+          description: Array of scheduled messages ordered by sendAt asc
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ScheduledMessage"
+
+  /schedule/{id}:
+    get:
+      summary: Get scheduled message by ID
+      operationId: getScheduledMessage
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: cmpa2gg140000tmo5tivi24m8
+      responses:
+        "200":
+          description: Scheduled message
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScheduledMessage"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundError"
+
+  /send:
+    post:
+      summary: Send message immediately
+      operationId: sendMessage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [recipient, body]
+              properties:
+                recipient:
+                  type: string
+                  example: "5585981480630"
+                body:
+                  type: string
+                  example: "Hello!"
+      responses:
+        "200":
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messageId:
+                    type: string
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
