@@ -1,7 +1,23 @@
-import 'dotenv/config';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as dotenv from 'dotenv';
 import { spawn } from 'child_process';
 import axios, { AxiosError } from 'axios';
 import { Client } from 'pg';
+
+// Must run before dotenv.config() so DATABASE_URL is available on a fresh clone.
+const envPath = path.resolve(process.cwd(), '.env');
+if (!fs.existsSync(envPath)) {
+  const examplePath = path.resolve(process.cwd(), '.env.example');
+  if (!fs.existsSync(examplePath)) {
+    console.error('[startup] ERROR: neither .env nor .env.example found. Cannot start.');
+    process.exit(1);
+  }
+  fs.copyFileSync(examplePath, envPath);
+  console.log('[startup] .env not found — created from .env.example. Review credentials before production use.');
+}
+
+dotenv.config();
 
 const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL ?? 'http://localhost:8080';
 const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY ?? '';
@@ -112,7 +128,8 @@ async function main(): Promise<void> {
   // 2. Wait for both services to be reachable before proceeding
   await Promise.all([waitForPostgres(), waitForEvolutionApi()]);
 
-  // 3. Apply DB migrations and init Evolution API instance concurrently
+  // 3. Generate Prisma client, then apply DB migrations and init Evolution API concurrently
+  await run('npx', ['prisma', 'generate'], 'prisma generate');
   await Promise.all([
     run('npx', ['prisma', 'migrate', 'deploy'], 'prisma migrate deploy'),
     run('tsx', ['scripts/init-evolution.ts'], 'infra:init (Evolution API)'),

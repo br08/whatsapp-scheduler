@@ -13,7 +13,8 @@
     "lint": "tsc --noEmit",
     "start": "tsx scripts/startup.ts",
     "infra:up": "docker compose up -d",
-    "infra:init": "tsx scripts/init-evolution.ts"
+    "infra:init": "tsx scripts/init-evolution.ts",
+    "postinstall": "prisma generate"
   },
   "keywords": [],
   "author": "",
