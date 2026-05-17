@@ -23,5 +23,5 @@
 
 ## Agent Behavior
 
-- Run `npm run typecheck` after every significant file change before reporting back to the user.
+- After every significant file change, after the end of every Phase and before starting any other, run `npm run test:coverage` and make sure it stays above 95%, then run `npm run test` and make sure all tests pass, then run `npm run typecheck` and make sure any problems are fixed. All this MUST be done before starting any other task or reporting back to the user.
 - Do not apologize. Be concise. Show the code.
