@@ -97,6 +97,63 @@ describe('GET /api/schedule', () => {
       sendAt: expect.any(String),
     });
   });
+
+  it('returns all statuses when no ?status filter is provided', async () => {
+    await prisma.scheduledMessage.createMany({
+      data: [
+        { recipient: 'a', body: 'pending', sendAt: new Date(Date.now() + 60_000), status: MessageStatus.PENDING, retryCount: 0 },
+        { recipient: 'b', body: 'sent', sendAt: new Date(Date.now() + 60_000), status: MessageStatus.SENT, retryCount: 0 },
+        { recipient: 'c', body: 'failed', sendAt: new Date(Date.now() + 60_000), status: MessageStatus.FAILED, retryCount: 3 },
+      ],
+    });
+    const res = await request(app).get('/api/schedule');
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveLength(3);
+  });
+
+  it('returns only messages matching ?status=PENDING', async () => {
+    await prisma.scheduledMessage.createMany({
+      data: [
+        { recipient: 'a', body: 'pending', sendAt: new Date(Date.now() + 60_000), status: MessageStatus.PENDING, retryCount: 0 },
+        { recipient: 'b', body: 'sent', sendAt: new Date(Date.now() + 60_000), status: MessageStatus.SENT, retryCount: 0 },
+      ],
+    });
+    const res = await request(app).get('/api/schedule?status=PENDING');
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveLength(1);
+    expect(res.body[0].status).toBe('PENDING');
+  });
+
+  it('returns only messages matching ?status=SENT', async () => {
+    await prisma.scheduledMessage.createMany({
+      data: [
+        { recipient: 'a', body: 'pending', sendAt: new Date(Date.now() + 60_000), status: MessageStatus.PENDING, retryCount: 0 },
+        { recipient: 'b', body: 'sent', sendAt: new Date(Date.now() + 60_000), status: MessageStatus.SENT, retryCount: 0 },
+      ],
+    });
+    const res = await request(app).get('/api/schedule?status=SENT');
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveLength(1);
+    expect(res.body[0].status).toBe('SENT');
+  });
+
+  it('returns only messages matching ?status=FAILED', async () => {
+    await prisma.scheduledMessage.createMany({
+      data: [
+        { recipient: 'a', body: 'failed', sendAt: new Date(Date.now() + 60_000), status: MessageStatus.FAILED, retryCount: 3 },
+        { recipient: 'b', body: 'sent', sendAt: new Date(Date.now() + 60_000), status: MessageStatus.SENT, retryCount: 0 },
+      ],
+    });
+    const res = await request(app).get('/api/schedule?status=FAILED');
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveLength(1);
+    expect(res.body[0].status).toBe('FAILED');
+  });
+
+  it('returns 400 for an invalid ?status value', async () => {
+    const res = await request(app).get('/api/schedule?status=INVALID');
+    expect(res.status).toBe(400);
+  });
 });
 
 describe('GET /api/schedule/:id', () => {
@@ -122,6 +179,37 @@ describe('GET /api/schedule/:id', () => {
     const res = await request(app).get('/api/schedule/nonexistent-id');
     expect(res.status).toBe(404);
     expect(res.body).toMatchObject({ error: 'Message not found' });
+  });
+
+  it('returns the message regardless of status when no ?status filter', async () => {
+    const msg = await prisma.scheduledMessage.create({
+      data: { recipient: 'a', body: 'sent msg', sendAt: new Date(Date.now() + 60_000), status: MessageStatus.SENT, retryCount: 0 },
+    });
+    const res = await request(app).get(`/api/schedule/${msg.id}`);
+    expect(res.status).toBe(200);
+    expect(res.body.status).toBe('SENT');
+  });
+
+  it('returns the message when ?status matches', async () => {
+    const msg = await prisma.scheduledMessage.create({
+      data: { recipient: 'a', body: 'sent msg', sendAt: new Date(Date.now() + 60_000), status: MessageStatus.SENT, retryCount: 0 },
+    });
+    const res = await request(app).get(`/api/schedule/${msg.id}?status=SENT`);
+    expect(res.status).toBe(200);
+    expect(res.body.status).toBe('SENT');
+  });
+
+  it('returns 404 when ?status does not match the message status', async () => {
+    const msg = await prisma.scheduledMessage.create({
+      data: { recipient: 'a', body: 'sent msg', sendAt: new Date(Date.now() + 60_000), status: MessageStatus.SENT, retryCount: 0 },
+    });
+    const res = await request(app).get(`/api/schedule/${msg.id}?status=PENDING`);
+    expect(res.status).toBe(404);
+  });
+
+  it('returns 400 for an invalid ?status value on /:id', async () => {
+    const res = await request(app).get('/api/schedule/some-id?status=INVALID');
+    expect(res.status).toBe(400);
   });
 });
 

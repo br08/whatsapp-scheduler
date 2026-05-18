@@ -91,6 +91,14 @@ paths:
     get:
       summary: List scheduled messages
       operationId: listScheduledMessages
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [PENDING, SENT, FAILED]
+          description: Filter messages by status. Returns all statuses when omitted.
       responses:
         "200":
           description: Array of scheduled messages ordered by sendAt asc
@@ -100,6 +108,12 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ScheduledMessage"
+        "400":
+          description: Invalid status value
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
 
   /schedule/{id}:
     get:
@@ -112,6 +126,13 @@ paths:
           schema:
             type: string
           example: cmpa2gg140000tmo5tivi24m8
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [PENDING, SENT, FAILED]
+          description: If provided, returns 404 when the message status does not match.
       responses:
         "200":
           description: Scheduled message
@@ -119,6 +140,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ScheduledMessage"
+        "400":
+          description: Invalid status value
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
         "404":
           description: Not found
           content:

@@ -52,8 +52,18 @@ router.post('/send', async (req, res) => {
   res.status(200).json({ messageId });
 });
 
-router.get('/schedule', async (_req, res) => {
+const statusFilterSchema = z.object({
+  status: z.enum(['PENDING', 'SENT', 'FAILED']).optional(),
+});
+
+router.get('/schedule', async (req, res) => {
+  const result = statusFilterSchema.safeParse(req.query);
+  if (!result.success) {
+    res.status(400).json({ error: 'Validation failed' });
+    return;
+  }
   const messages = await prisma.scheduledMessage.findMany({
+    where: result.data.status ? { status: result.data.status } : undefined,
     orderBy: { sendAt: 'asc' },
     select: { id: true, recipient: true, body: true, sendAt: true, status: true, retryCount: true },
   });
@@ -61,11 +71,16 @@ router.get('/schedule', async (_req, res) => {
 });
 
 router.get('/schedule/:id', async (req, res) => {
+  const result = statusFilterSchema.safeParse(req.query);
+  if (!result.success) {
+    res.status(400).json({ error: 'Validation failed' });
+    return;
+  }
   const message = await prisma.scheduledMessage.findUnique({
     where: { id: req.params.id },
     select: { id: true, recipient: true, body: true, sendAt: true, status: true, retryCount: true },
   });
-  if (!message) {
+  if (!message || (result.data.status && message.status !== result.data.status)) {
     res.status(404).json({ error: 'Message not found' });
     return;
   }
