@@ -4,3 +4,4 @@ prisma
 tmp
 .claude
 *.log
+app.log

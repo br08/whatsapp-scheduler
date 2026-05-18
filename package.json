@@ -14,6 +14,9 @@
     "start": "tsx scripts/startup.ts",
     "infra:up": "docker compose up -d",
     "infra:init": "tsx scripts/init-evolution.ts",
+    "start:bg": "tsx scripts/startup.ts &",
+    "start:log": "tsx scripts/startup.ts > app.log 2>&1 &",
+    "stop": "(pkill -f 'tsx src/index.ts' || true) && sleep 2 && docker compose down",
     "postinstall": "prisma generate"
   },
   "keywords": [],
