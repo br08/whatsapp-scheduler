@@ -1,5 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import * as fs from 'fs';
+import * as os from 'os';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
 
@@ -97,9 +98,12 @@ async function pollQrCode(maxWaitMs = 30_000): Promise<string | null> {
   return null;
 }
 
+export const QR_TMP_DIR = path.join(os.tmpdir(), 'whatsapp-scheduler');
+
 function saveQrPng(base64: string): void {
   const data = base64.replace(/^data:image\/png;base64,/, '');
-  const outPath = path.resolve(process.cwd(), 'qr.png');
+  fs.mkdirSync(QR_TMP_DIR, { recursive: true });
+  const outPath = path.join(QR_TMP_DIR, 'qr.png');
   fs.writeFileSync(outPath, Buffer.from(data, 'base64'));
   console.log(`QR code saved to ${outPath}`);
 }

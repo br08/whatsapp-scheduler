@@ -7,11 +7,13 @@ import { redisConnection } from '@/src/queues/connection';
 import { messageQueue, QUEUE_NAME } from '@/src/queues/producer';
 import { processJob } from '@/src/queues/worker';
 import { processCleanupJob } from '@/src/queues/cleanup';
+import { processTmpCleanupJob } from '@/src/queues/tmpCleanup';
 import { logger } from '@/src/utils/logger';
 
 const PORT = env.PORT;
 
 const CLEANUP_QUEUE_NAME = 'cleanup';
+const TMP_CLEANUP_QUEUE_NAME = 'tmp-cleanup';
 
 const cleanupQueue = new Queue(CLEANUP_QUEUE_NAME, { connection: redisConnection });
 void cleanupQueue.upsertJobScheduler('hourly-cleanup', { every: 60 * 60 * 1000 }, { name: 'cleanup' });
@@ -24,6 +26,15 @@ const cleanupWorker = new Worker(
 
 cleanupWorker.on('failed', (job, err) => {
   logger.error({ jobId: job?.id, err: err.message }, 'Cleanup job failed');
+});
+
+const tmpCleanupQueue = new Queue(TMP_CLEANUP_QUEUE_NAME, { connection: redisConnection });
+void tmpCleanupQueue.upsertJobScheduler('30min-tmp-cleanup', { every: 30 * 60 * 1000 }, { name: 'tmp-cleanup' });
+
+const tmpCleanupWorker = new Worker(TMP_CLEANUP_QUEUE_NAME, processTmpCleanupJob, { connection: redisConnection });
+
+tmpCleanupWorker.on('failed', (job, err) => {
+  logger.error({ jobId: job?.id, err: err.message }, 'Tmp cleanup job failed');
 });
 
 const worker = new Worker(QUEUE_NAME, processJob, { connection: redisConnection });
@@ -45,10 +56,12 @@ async function shutdown(signal: string): Promise<void> {
 
   await worker.close();
   await cleanupWorker.close();
+  await tmpCleanupWorker.close();
   logger.info('BullMQ workers closed');
 
   await messageQueue.close();
   await cleanupQueue.close();
+  await tmpCleanupQueue.close();
   logger.info('BullMQ queues closed');
 
   await redisConnection.quit();
