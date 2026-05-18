@@ -41,7 +41,8 @@
 - [x] Read `JOURNEY.md`.
 - [x] Write API endpoint tests in `tests/api.test.ts` (Happy path + Validation edge cases).
 - [x] Write worker tests in `tests/worker.test.ts` (Happy path + Gateway Down + Max retries + Idempotency).
-- [x] Run `npm run test` and verify that tests fail. (Failing: missing @/src/api/app and @/src/queues/worker — correct Phase 5 state. Fixed Prisma v7 adapter setup and vitest globals in tsconfig.)
+- [x] Write cleanup tests in `tests/cleanup.test.ts` covering all five cleanup edge cases from `JOURNEY.md`: SENT past retention deleted, FAILED past retention deleted, within-window records kept, PENDING never deleted, nothing-to-clean completes without error.
+- [x] Run `npm run test` and verify that tests fail. (cleanup.test.ts failed with missing module when implementation removed — correct Phase 5 state.)
 
 ## Phase 6: Implementation (Green State)
 - [x] Create a POST endpoint in `src/api/routes.ts` to accept scheduling requests.
@@ -49,9 +50,12 @@
 - [x] Setup BullMQ connection in `src/queues/connection.ts` and producer in `src/queues/producer.ts`.
 - [x] Wire the POST endpoint to the database creation (save as PENDING) and the queue producer.
 - [x] Implement the BullMQ worker logic in `src/queues/worker.ts` to process jobs, call the REST wrapper, and update database status to make worker tests pass.
-- [x] Run `npm run test` to ensure full test suite is green. (10/10 passing. Fixed MSW v2 onUnhandledRequest: 'error' blocking passthrough for supertest requests — changed to 'warn'. Used regex-free Zod validation for scheduledTime to avoid Zod v4 API drift.)
-- [x] Add test coverage to ensure all code is tested. (Added @vitest/coverage-v8; fileParallelism: false to fix shared-DB race condition under coverage; new tests/whatsapp.test.ts for network-error and malformed-response paths.)
-- [x] Ensure coverage is at least 80%. Add more tests if needed. (Branches: 82.6%, Statements: 95.45%, Functions: 88.88%, Lines: 95.45% — all ≥ 80%.)
+- [x] Add `FAILED_RETENTION_DAYS` (default: 1) and `SENT_RETENTION_DAYS` (default: 7) to `src/config/env.ts` and `.env.example`.
+- [x] Implement `src/queues/cleanup.ts` with `processCleanupJob()` that deletes SENT records older than `SENT_RETENTION_DAYS` and FAILED records older than `FAILED_RETENTION_DAYS`. PENDING records must never be touched.
+- [x] Register a BullMQ repeatable cleanup job (every hour) and its worker in `src/index.ts`.
+- [x] Run `npm run test` to ensure full test suite is green. (30/30 passing.)
+- [x] Add test coverage to ensure all code is tested.
+- [x] Ensure coverage stays above 95%. (100% across all metrics.)
 
 ## Phase 7: Refactoring & Polish
 - [x] Add structured logging (Pino) to the worker logic. (Added info logs for job start and success paths in processJob; error path already had logging.)

@@ -9,6 +9,8 @@ const envSchema = z.object({
   EVOLUTION_API_URL: z.string().url(),
   EVOLUTION_API_KEY: z.string().min(1),
   EVOLUTION_INSTANCE: z.string().default('scheduler'),
+  SENT_RETENTION_DAYS: z.coerce.number().int().positive().default(7),
+  FAILED_RETENTION_DAYS: z.coerce.number().int().positive().default(1),
 });
 
 export type Env = z.infer<typeof envSchema>;
