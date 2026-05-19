@@ -8,6 +8,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
+    exclude: ['dist/**', 'node_modules/**'],
     setupFiles: ['./tests/setup.ts'],
     testTimeout: 15_000,
     fileParallelism: false,

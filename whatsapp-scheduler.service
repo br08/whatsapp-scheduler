@@ -1,0 +1,18 @@
+[Unit]
+Description=WhatsApp Scheduler
+After=network.target docker.service
+Wants=docker.service
+
+[Service]
+Type=simple
+User=YOUR_USER
+WorkingDirectory=/path/to/whatsapp-scheduler
+EnvironmentFile=/path/to/whatsapp-scheduler/.env
+Environment=NODE_ENV=production
+ExecStartPre=/usr/bin/docker compose up -d
+ExecStart=/usr/bin/npm run start
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
