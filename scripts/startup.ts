@@ -19,8 +19,17 @@ if (!fs.existsSync(envPath)) {
 
 dotenv.config();
 
-const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL ?? 'http://localhost:8080';
-const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY ?? '';
+const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL;
+const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY;
+
+if (!EVOLUTION_API_URL) {
+  console.error('[startup] ERROR: EVOLUTION_API_URL is missing or empty in .env');
+  process.exit(1);
+}
+if (!EVOLUTION_API_KEY) {
+  console.error('[startup] ERROR: EVOLUTION_API_KEY is missing or empty in .env');
+  process.exit(1);
+}
 const INSTANCE_NAME = 'scheduler';
 
 const apiClient = axios.create({

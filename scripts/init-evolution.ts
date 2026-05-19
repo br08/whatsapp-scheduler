@@ -2,12 +2,10 @@ import axios, { AxiosError } from 'axios';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import * as dotenv from 'dotenv';
+import { env } from '@/src/config/env';
 
-dotenv.config();
-
-const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL ?? 'http://localhost:8080';
-const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY ?? '';
+const EVOLUTION_API_URL = env.EVOLUTION_API_URL;
+const EVOLUTION_API_KEY = env.EVOLUTION_API_KEY;
 const INSTANCE_NAME = 'scheduler';
 
 const client = axios.create({
