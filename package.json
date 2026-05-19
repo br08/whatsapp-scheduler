@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx scripts/startup.ts",
-    "build": "tsc -p tsconfig.prod.json && tsc-alias -p tsconfig.prod.json",
+    "build": "tsc -p tsconfig.prod.json && tsc-alias -p tsconfig.prod.json && mkdir -p dist/docs && cp docs/openapi.yaml dist/docs/",
     "test": "vitest run",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",

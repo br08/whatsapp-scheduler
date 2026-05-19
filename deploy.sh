@@ -46,7 +46,7 @@ docker compose up -d
 
 # ── 6. Wait for PostgreSQL ────────────────────────────────────────────────────
 echo "[deploy] waiting for PostgreSQL..."
-DATABASE_URL="$(grep '^DATABASE_URL' .env | cut -d= -f2- | tr -d '"')"
+export DATABASE_URL="$(grep '^DATABASE_URL' .env | cut -d= -f2- | tr -d '"')"
 DEADLINE=$(( $(date +%s) + 60 ))
 until node -e "
   const { Client } = require('pg');
