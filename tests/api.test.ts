@@ -253,4 +253,13 @@ describe('POST /api/send', () => {
       .send({ recipient: '5511999998888', body: 'will throw TypeError' });
     expect(res.status).toBe(500);
   });
+
+  it('returns 400 for malformed JSON (e.g. literal newline in the body)', async () => {
+    const res = await request(app)
+      .post('/api/send')
+      .set('Content-Type', 'application/json')
+      .send('{"recipient":"5511999998888","body":"line 1\nline 2"}');
+    expect(res.status).toBe(400);
+    expect(res.body).toMatchObject({ error: 'Invalid JSON in request body' });
+  });
 });
